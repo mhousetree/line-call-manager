@@ -48,10 +48,10 @@ def handle_message(event):
             datetime.timezone(datetime.timedelta(hours=9))
         )
         next_weekday = '日曜日' if dt_now.weekday() < 3 else '水曜日'
-        finished_time = dt_now.strftime('%Y年%m月%d日(%A) %H:%M')
+        finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         text = finished_time + 'に通話が完了しました。\n次回の通話は' + next_weekday + 'までに行います。'
     else:
-        text = event.message.text
+        text = event.message.text + "\n" + event.source.groupId
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text))
