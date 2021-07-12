@@ -51,7 +51,8 @@ def handle_message(event):
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         text = finished_time + 'に通話が完了しました。\n次回の通話は' + next_weekday + 'までに行います。'
     else:
-        text = event.message.text + "\n" + event.source.groupId
+        text = event.message.text
+        print(event)
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text))
