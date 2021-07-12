@@ -10,6 +10,7 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
+import datetime
 
 app = Flask(__name__)
 
@@ -19,7 +20,9 @@ GROUP_ID = os.environ["GROUP_ID"]
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 def main():
-    pushText = TextSendMessage(text="10分経ちました")
+    dt_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    text = '現在の時刻は' + dt_now.strftime('%Y年%m月%d日 %H:%M') + 'です。'
+    pushText = TextSendMessage(text)
     line_bot_api.push_message(GROUP_ID, messages=pushText)
 
 if __name__ == "__main__":
