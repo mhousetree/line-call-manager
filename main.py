@@ -47,8 +47,9 @@ def handle_message(event):
         dt_now = datetime.datetime.now(
             datetime.timezone(datetime.timedelta(hours=9))
         )
-        finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
-        text = finished_time + 'に通話が完了しました。今日は' + get_day_of_week_jp(dt_now) + '曜日です。\n次回の通話はn日後までに行います。'
+        next_weekday = '日曜日' if dt_now.weekday() < 3 else '水曜日'
+        finished_time = dt_now.strftime('%Y年%m月%d日(%A) %H:%M')
+        text = finished_time + 'に通話が完了しました。\n次回の通話は' + next_weekday + 'までに行います。'
     else:
         text = event.message.text
     line_bot_api.reply_message(

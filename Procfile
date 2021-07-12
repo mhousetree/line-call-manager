@@ -1,1 +1,1 @@
-web: python main.py
+linebot: python main.py
