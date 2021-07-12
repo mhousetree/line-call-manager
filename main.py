@@ -41,18 +41,22 @@ def get_day_of_week_jp(dt):
     w_list = ['月', '火', '水', '木', '金', '土', '日']
     return w_list[dt.weekday()]
 
+def get_day_of_next_call(dt):
+    next_weekday = 6 if dt.weekday() < 3 else 8
+    days_delta = next_weekday - dt.weekday()
+    return dt + datetime.timedelta(days=days_delta)
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.text == '通話完了':
         dt_now = datetime.datetime.now(
             datetime.timezone(datetime.timedelta(hours=9))
         )
-        next_weekday = '日曜日' if dt_now.weekday() < 3 else '水曜日'
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
-        text = finished_time + 'に通話が完了しました。\n次回の通話は' + next_weekday + 'までに行います。'
+        date_next_call = get_day_of_next_call(dt_now)
+        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%Y年%m月%d日') + '([])'.format(get_day_of_week_jp(date_next_call)) + 'までに行います。'
     else:
         text = event.message.text
-        print(event)
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text))
