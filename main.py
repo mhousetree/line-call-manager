@@ -54,7 +54,7 @@ def handle_message(event):
         )
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         date_next_call = get_day_of_next_call(dt_now)
-        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%Y年%m月%d日') + '([])'.format(get_day_of_week_jp(date_next_call)) + 'までに行います。'
+        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%Y年%m月%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + 'までに行います。'
     else:
         text = event.message.text
     line_bot_api.reply_message(
