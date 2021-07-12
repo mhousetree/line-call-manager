@@ -58,7 +58,7 @@ def handle_message(event):
         date_next_call = get_day_of_next_call(dt_now)
         text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
         conn = r.connect()
-        conn.set('reserved_date', date_next_call.strftime('%Y/%M/%d 22:00'))
+        conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d 22:00'))
     else:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
