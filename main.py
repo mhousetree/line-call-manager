@@ -37,11 +37,18 @@ def callback():
 
     return 'OK'
 
+def get_day_of_week_jp(dt):
+    w_list = ['月', '火', '水', '木', '金', '土', '日']
+    return w_list[dt.weekday()]
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.text == '通話完了':
-        text = str(datetime.datetime.now()) + 'に通話が完了しました。\n次回の通話はn日後までに行います。'
+        dt_now = datetime.datetime.now(
+            datetime.timezone(datetime.timedelta(hours=9))
+        )
+        finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
+        text = finished_time + 'に通話が完了しました。今日は' + get_day_of_week_jp(dt_now) + '曜日です。\n次回の通話はn日後までに行います。'
     else:
         text = event.message.text
     line_bot_api.reply_message(
