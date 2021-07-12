@@ -41,7 +41,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.text == '通話完了':
-        text = datetime.datetime.now() + 'に通話が完了しました。\n次回の通話はn日後までに行います。'
+        text = str(datetime.datetime.now()) + 'に通話が完了しました。\n次回の通話はn日後までに行います。'
     else:
         text = event.message.text
     line_bot_api.reply_message(
