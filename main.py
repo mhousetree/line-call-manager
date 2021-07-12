@@ -12,6 +12,8 @@ from linebot.models import (
 import os
 import datetime
 
+import r
+
 app = Flask(__name__)
 
 LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
@@ -55,6 +57,8 @@ def handle_message(event):
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         date_next_call = get_day_of_next_call(dt_now)
         text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
+        conn = r.connect()
+        conn.set('reserved_date', date_next_call.strftime('%Y/%M/%d 22:00'))
     else:
         text = event.message.text
     line_bot_api.reply_message(
