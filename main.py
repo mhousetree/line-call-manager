@@ -60,7 +60,9 @@ def handle_message(event):
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%M/%d 22:00'))
     else:
-        text = event.message.text
+        conn = r.connect()
+        date_next_call = conn.get('reserved_date')
+        text = '次回の通話は' +  date_next_call + 'までに行われます。'
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text))
