@@ -14,11 +14,11 @@ import datetime
 
 app = Flask(__name__)
 
-YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
+LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
+LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
-line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -54,7 +54,7 @@ def handle_message(event):
         )
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         date_next_call = get_day_of_next_call(dt_now)
-        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%Y年%m月%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + 'までに行います。'
+        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
     else:
         text = event.message.text
     line_bot_api.reply_message(
