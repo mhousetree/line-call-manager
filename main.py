@@ -105,8 +105,7 @@ def handle_postback(event):
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("通話予定日時を " + "({}) ".format(get_day_of_week_jp(dt_new)).join(date_next_call.strip(" ")) + " に変更しました。"))
-
+        TextSendMessage("通話予定日時を " + "({}) ".format(get_day_of_week_jp(dt_new)).join(date_next_call.split(" ")) + " に変更しました。"))
 
 
 if __name__ == "__main__":
