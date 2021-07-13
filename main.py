@@ -59,6 +59,7 @@ def handle_message(event):
         _text = finished_time + 'に通話が終了しました。\n次回の通話は' + date_next_call.strftime('%d日(%a)') + ' 22:00までに行います。'
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d(%a) 22:00'))
+        conn.set('reminded', 'false')
         content = TextSendMessage(_text)
     elif '変更' in event.message.text:
         content = TemplateSendMessage(
@@ -75,6 +76,8 @@ def handle_message(event):
                 ]
             )
         )
+        conn = r.connect()
+        conn.set('reminded', 'false')
     elif '確認' in event.message.text:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
