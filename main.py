@@ -66,9 +66,9 @@ def handle_message(event):
         content = TextSendMessage(_text)
     elif '使い方' in event.message.text:
         how_to_use = [
-            "{} 通話終了時には『通話終了』".format(chr(int(0x1f4de))),
-            "{} 次の通話予定日時を変更する場合『日時変更』".format(chr(int(0x1f4c5))),
-            "{} 操作方法の確認は『使い方』".format(chr(int(0x2753)))
+            "{} 通話終了時 → \"通話終了\"".format(chr(int(0x1f4de))),
+            "{} 予定日時を変更 →\"日時変更\"".format(chr(int(0x1f4c5))),
+            "{} 使い方の確認 → \"使い方\"".format(chr(int(0x2753)))
         ]
         _text = "\n".join(how_to_use)
         content = TextSendMessage(_text)
@@ -105,7 +105,7 @@ def handle_postback(event):
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("通話予定日時を" + date_next_call + "(" + get_day_of_week_jp(dt_new) + ") に変更しました。"))
+        TextSendMessage("通話予定日時を " + "({}) ".format(get_day_of_week_jp(dt_new)).join(date_next_call.strip(" ")) + " に変更しました。"))
 
 
 
