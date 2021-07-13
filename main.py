@@ -76,8 +76,8 @@ def handle_message(event):
         content = TemplateSendMessage(
             alt_text='日時変更',
             template=ButtonsTemplate(
-                text='日時変更',
-                title='次の通話予定日時を変更するには下のボタンをタップ',
+                text='次の通話予定日時を変更するには下のボタンをタップ',
+                title='日時変更',
                 actions=[
                     DatetimePickerTemplateAction(
                         label='日時を選択する',
