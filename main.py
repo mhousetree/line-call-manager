@@ -76,8 +76,6 @@ def handle_message(event):
                 ]
             )
         )
-        conn = r.connect()
-        conn.set('reminded', 'false')
     elif '確認' in event.message.text:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
@@ -107,6 +105,9 @@ def handle_postback(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage("通話予定日時を " + date_next_call + " に変更しました。"))
+        
+    conn = r.connect()
+    conn.set('reminded', 'false')
 
 
 if __name__ == "__main__":
