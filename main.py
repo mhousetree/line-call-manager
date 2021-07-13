@@ -28,7 +28,7 @@ LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
+locale.setlocale(locale.LC_TIME, 'Japanese_Japan.UTF-8')
 
 @app.route("/callback", methods=['POST'])
 def callback():
