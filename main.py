@@ -19,6 +19,7 @@ from linebot.models.events import PostbackEvent
 from linebot.models.template import ButtonsTemplate
 
 import r
+import d
 
 app = Flask(__name__)
 
@@ -47,26 +48,14 @@ def callback():
 
     return 'OK'
 
-def get_day_of_week_jp(dt):
-    w_list = ['月', '火', '水', '木', '金', '土', '日']
-    return w_list[dt.weekday()]
-
-def get_dt_of_next_call(dt):
-    next_weekday = 6 if dt.weekday() < 3 else 8
-    days_delta = next_weekday - dt.weekday()
-    return dt + datetime.timedelta(days=days_delta)
-
-def get_str_dt(dt):
-    return dt.strftime('%Y/%m/%d(%a) %H:%M')
-
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if '終了' in event.message.text:
         dt_now = datetime.datetime.now(
             datetime.timezone(datetime.timedelta(hours=9))
         )
-        finished_time = get_str_dt(dt_now)
-        date_next_call = get_dt_of_next_call(dt_now)
+        finished_time = d.get_str_dt(dt_now)
+        date_next_call = d.get_dt_of_next_call(dt_now)
         _text = finished_time + 'に通話が終了しました。\n次回の通話は' + date_next_call.strftime('%d日(%a)') + ' 22:00までに行います。'
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d(%a) 22:00'))
@@ -108,7 +97,7 @@ def handle_message(event):
 @handler.add(PostbackEvent)
 def handle_postback(event):
     dt_new = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
-    date_next_call = get_str_dt(dt_new)
+    date_next_call = d.get_str_dt(dt_new)
     conn = r.connect()
     conn.set('reserved_date', date_next_call)
 

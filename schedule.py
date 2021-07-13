@@ -1,7 +1,3 @@
-from flask import Flask, request, abort
-import os
-import r
-
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -11,9 +7,12 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
-import datetime
 
-app = Flask(__name__)
+import os
+import datetime
+import locale
+
+import r
 
 LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
 LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
@@ -23,6 +22,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 def main():
     conn = r.connect()
     date_next_call = conn.get('reserved_date')
+
     dt_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
     text = '現在の時刻は' + dt_now.strftime('%Y年%m月%d日 %H:%M') + 'です。\n次回の通話は' +  date_next_call + 'に行われます。'
     pushText = TextSendMessage(text)
