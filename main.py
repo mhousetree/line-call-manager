@@ -54,32 +54,33 @@ def get_day_of_next_call(dt):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    if event.message.text == '通話完了':
+    if '終了' in event.message.text:
         dt_now = datetime.datetime.now(
             datetime.timezone(datetime.timedelta(hours=9))
         )
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         date_next_call = get_day_of_next_call(dt_now)
-        _text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
+        _text = finished_time + 'に通話が終了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d 22:00'))
         content = TextSendMessage(_text)
     elif '使い方' in event.message.text:
         how_to_use = [
             "{} 通話終了時には『通話終了』".format(chr(int(0x1f4de))),
+            "{} 次の通話予定日時を変更する場合『日時変更』".format(chr(int(0x1f4c5))),
             "{} 操作方法の確認は『使い方』".format(chr(int(0x2753)))
         ]
         _text = "\n".join(how_to_use)
         content = TextSendMessage(_text)
     elif '変更' in event.message.text:
         content = TemplateSendMessage(
-            alt_text='日時を設定',
+            alt_text='日時変更',
             template=ButtonsTemplate(
-                text='日時を設定',
-                title='YYYY-MM-dd',
+                text='日時変更',
+                title='次の通話予定日時を変更するには下のボタンをタップ',
                 actions=[
                     DatetimePickerTemplateAction(
-                        label='設定',
+                        label='日時を選択する',
                         data='mode=datetime',
                         mode='datetime'
                     )
@@ -89,7 +90,7 @@ def handle_message(event):
     else:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
-        _text = '次回の通話は' +  date_next_call + 'までに行われます。'
+        _text = '次回の通話は' +  date_next_call + 'に行われます。'
         content = TextSendMessage(_text)
     line_bot_api.reply_message(
         event.reply_token,
@@ -97,13 +98,14 @@ def handle_message(event):
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
-    content_list = [
-        event.postback.params['datetime'],
-        str(type(event.postback.params['datetime']))
-    ]
+    dt_new = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
+    date_next_call = dt_new.strftime('%Y/%m/%d %H:%M')
+    conn = r.connect()
+    conn.set('reserved_date', date_next_call)
+
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("\n".join(content_list)))
+        TextSendMessage("通話予定日時を" + date_next_call + "(" + get_day_of_week_jp(dt_new) + ") に変更しました。"))
 
 
 

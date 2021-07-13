@@ -24,7 +24,7 @@ def main():
     conn = r.connect()
     date_next_call = conn.get('reserved_date')
     dt_now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
-    text = '現在の時刻は' + dt_now.strftime('%Y年%m月%d日 %H:%M') + 'です。\n次回の通話は' +  date_next_call + 'までに行われます。'
+    text = '現在の時刻は' + dt_now.strftime('%Y年%m月%d日 %H:%M') + 'です。\n次回の通話は' +  date_next_call + 'に行われます。'
     pushText = TextSendMessage(text)
     line_bot_api.push_message(GROUP_ID, messages=pushText)
 
