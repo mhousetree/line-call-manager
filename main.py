@@ -11,6 +11,8 @@ from linebot.models import (
 )
 import os
 import datetime
+import locale
+
 from linebot.models.actions import DatetimePickerAction
 from linebot.models.events import PostbackEvent
 
@@ -25,6 +27,8 @@ LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
+
+locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -47,10 +51,13 @@ def get_day_of_week_jp(dt):
     w_list = ['月', '火', '水', '木', '金', '土', '日']
     return w_list[dt.weekday()]
 
-def get_day_of_next_call(dt):
+def get_dt_of_next_call(dt):
     next_weekday = 6 if dt.weekday() < 3 else 8
     days_delta = next_weekday - dt.weekday()
     return dt + datetime.timedelta(days=days_delta)
+
+def get_str_dt(dt):
+    return dt.strftime('%Y/%m/%d(%a) %H:%M')
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -58,25 +65,17 @@ def handle_message(event):
         dt_now = datetime.datetime.now(
             datetime.timezone(datetime.timedelta(hours=9))
         )
-        finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
-        date_next_call = get_day_of_next_call(dt_now)
-        _text = finished_time + 'に通話が終了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
+        finished_time = get_str_dt(dt_now)
+        date_next_call = get_dt_of_next_call(dt_now)
+        _text = finished_time + 'に通話が終了しました。\n次回の通話は' + date_next_call.strftime('%d日(%a)') + ' 22:00までに行います。'
         conn = r.connect()
-        conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d 22:00'))
-        content = TextSendMessage(_text)
-    elif '使い方' in event.message.text:
-        how_to_use = [
-            "{} 通話終了時 → \"通話終了\"".format(chr(int(0x1f4de))),
-            "{} 予定日時を変更 →\"日時変更\"".format(chr(int(0x1f4c5))),
-            "{} 使い方の確認 → \"使い方\"".format(chr(int(0x2753)))
-        ]
-        _text = "\n".join(how_to_use)
+        conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d(%a) 22:00'))
         content = TextSendMessage(_text)
     elif '変更' in event.message.text:
         content = TemplateSendMessage(
             alt_text='日時変更',
             template=ButtonsTemplate(
-                text='次の通話予定日時を変更するには下のボタンをタップ',
+                text='次の通話予定日時を変更するには\n下のボタンをタップ',
                 title='日時変更',
                 actions=[
                     DatetimePickerTemplateAction(
@@ -87,11 +86,21 @@ def handle_message(event):
                 ]
             )
         )
-    else:
+    elif '確認' in event.message.text:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
         _text = '次回の通話は' +  date_next_call + 'に行われます。'
         content = TextSendMessage(_text)
+    else:
+        how_to_use = [
+            "{} 通話終了時 → \"終了\"".format(chr(int(0x1f4de))),
+            "{} 予定日時を変更 →\"変更\"".format(chr(int(0x1f4c5))),
+            "{} 予定日時を確認 →\"確認\"".format(chr(int(0x1f440))),
+            "{} 使い方の確認 → \"使い方\"".format(chr(int(0x2753)))
+        ]
+        _text = "\n".join(how_to_use)
+        content = TextSendMessage(_text)
+
     line_bot_api.reply_message(
         event.reply_token,
         content)
@@ -99,13 +108,13 @@ def handle_message(event):
 @handler.add(PostbackEvent)
 def handle_postback(event):
     dt_new = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
-    date_next_call = dt_new.strftime('%Y/%m/%d %H:%M')
+    date_next_call = get_str_dt(dt_new)
     conn = r.connect()
     conn.set('reserved_date', date_next_call)
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("通話予定日時を " + "({}) ".format(get_day_of_week_jp(dt_new)).join(date_next_call.split(" ")) + " に変更しました。"))
+        TextSendMessage("通話予定日時を " + date_next_call + " に変更しました。"))
 
 
 if __name__ == "__main__":
