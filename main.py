@@ -103,7 +103,7 @@ def handle_postback(event):
     ]
     line_bot_api.reply_message(
         event.reply_token,
-        "\n".join(content_list))
+        TextSendMessage("\n".join(content_list)))
 
 
 
