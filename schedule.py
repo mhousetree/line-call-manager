@@ -24,7 +24,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 def main():
     conn = r.connect()
     date_next_call = conn.get('reserved_date')
-    dt_next_call = datetime.datetime.strptime(date_next_call, '%Y/%m/%d(%a) %H:%M')
+    dt_next_call = datetime.datetime.strptime(date_next_call, '%Y/%m/%d(%a) %H:%M').replace(tzinfo=datetime.timezone(datetime.timedelta(hours=9)))
 
     dt_now = datetime.datetime.now(
         datetime.timezone(datetime.timedelta(hours=9))
