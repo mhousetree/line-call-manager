@@ -7,10 +7,13 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, DatetimePickerTemplateAction, messages,
 )
 import os
 import datetime
+from linebot.models.actions import DatetimePickerAction
+
+from linebot.models.template import ButtonsTemplate
 
 import r
 
@@ -56,22 +59,40 @@ def handle_message(event):
         )
         finished_time = dt_now.strftime('%Y年%m月%d日 %H:%M')
         date_next_call = get_day_of_next_call(dt_now)
-        text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
+        _text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d 22:00'))
+        message = TextSendMessage(_text)
     elif '使い方' in event.message.text:
         how_to_use = [
             "{} 通話終了時には『通話終了』".format(chr(int(0x1f4de))),
             "{} 操作方法の確認は『使い方』".format(chr(int(0x2753)))
         ]
-        text = "\n".join(how_to_use)
+        _text = "\n".join(how_to_use)
+        message = TextSendMessage(_text)
+    elif '変更' in event.message.text:
+        message = TemplateSendMessage(
+            alt_text='日時を設定',
+            template=ButtonsTemplate(
+                text='日時を設定',
+                title='YYYY-MM-dd',
+                actions=[
+                    DatetimePickerTemplateAction(
+                        label='設定',
+                        data='mode=datetime',
+                        mode='datetime'
+                    )
+                ]
+            )
+        )
     else:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
-        text = '次回の通話は' +  date_next_call + 'までに行われます。'
+        _text = '次回の通話は' +  date_next_call + 'までに行われます。'
+        message = TextSendMessage(_text)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text))
+        message)
 
 
 if __name__ == "__main__":
