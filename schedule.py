@@ -24,7 +24,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 def main():
     conn = r.connect()
     date_next_call = conn.get('reserved_date')
-    dt_next_call = datetime.datetime.strptime(date_next_call, '%Y年%m月%d日(%a) %H:%M')
+    dt_next_call = datetime.datetime.strptime(date_next_call, '%Y/%m/%d(%a) %H:%M')
 
     dt_now = datetime.datetime.now(
         datetime.timezone(datetime.timedelta(hours=9))
@@ -36,7 +36,7 @@ def main():
         line_bot_api.push_message(GROUP_ID, pushText)
         conn.set('reminded', 'true')
     else:    
-        text = '現在の時刻は' + dt_now.strftime('%Y年%m月%d日(%a) %H:%M') + 'です。\n次回の通話は' +  date_next_call + 'に行われます。'
+        text = '現在の時刻は' + dt_now.strftime('%Y/%m/%d(%a) %H:%M') + 'です。\n次回の通話は' +  date_next_call + 'に行われます。'
         pushText = TextSendMessage(text)
         line_bot_api.push_message(GROUP_ID, messages=pushText)
 
