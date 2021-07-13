@@ -99,7 +99,7 @@ def handle_message(event):
 def handle_postback(event):
     content_list = [
         event.postback.params['datetime'],
-        type(event.postback.params['datetime'])
+        str(type(event.postback.params['datetime']))
     ]
     line_bot_api.reply_message(
         event.reply_token,
