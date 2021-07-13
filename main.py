@@ -59,6 +59,12 @@ def handle_message(event):
         text = finished_time + 'に通話が完了しました。\n次回の通話は' + date_next_call.strftime('%d日') + '({})'.format(get_day_of_week_jp(date_next_call)) + ' 22:00までに行います。'
         conn = r.connect()
         conn.set('reserved_date', date_next_call.strftime('%Y/%m/%d 22:00'))
+    elif '使い方' in event.message.text:
+        how_to_use = [
+            "{} 通話終了時には『通話終了』".format(chr(int(0x1f4de))),
+            "{} 操作方法の確認は『使い方』".format(chr(int(0x2753)))
+        ]
+        text = "\n".join(how_to_use)
     else:
         conn = r.connect()
         date_next_call = conn.get('reserved_date')
